@@ -8,22 +8,18 @@ import {
     TextField,
     Button,
     Select,
+    TextStyle,
 } from "@shopify/polaris";
 import { notEmptyString, useField, useForm } from "@shopify/react-form";
-import {
-    ContextualSaveBar,
-    ResourcePicker,
-    useAppBridge,
-    useNavigate,
-} from "@shopify/app-bridge-react";
+import { ContextualSaveBar, useNavigate } from "@shopify/app-bridge-react";
 
 const SyncForm = ({ syncJob: InitialJob }) => {
     // States
     const [syncJob, setSyncJob] = useState(InitialJob);
     const [showResourcePicker, setShowResourcePicker] = useState(false);
-    const [selectBoard, setSelectBoard] = useState(syncJob?.boardID);
-    const [selectList, setSelectList] = useState(syncJob?.listId);
-    const [selectOrder, setSelectOrder] = useState(syncJob?.fromOrder);
+    const [selectBoard, setSelectBoard] = useState(syncJob?.trelloBoard);
+    const [selectList, setSelectList] = useState(syncJob?.trelloList);
+    const [selectOrder, setSelectOrder] = useState(syncJob?.trelloOrder);
     const navigate = useNavigate();
 
     // Placeholder function. Will be replaced by the save function
@@ -31,7 +27,7 @@ const SyncForm = ({ syncJob: InitialJob }) => {
 
     // Set up form state
     const {
-        fields: { title, boardID, listID, fromOrder },
+        fields: { title, boardId, listId, fromOrder },
         dirty,
         reset,
         submit,
@@ -43,35 +39,35 @@ const SyncForm = ({ syncJob: InitialJob }) => {
                 value: syncJob?.title || "",
                 validates: [notEmptyString("Please name your sync job")],
             }),
-            boardID: useField(syncJob?.boardID || ""),
-            listId: useField(syncJob?.listId || ""),
-            fromOrder: useField(syncJob?.fromOrder),
+            boardId: useField({ value: syncJob?.trelloBoard?.id || "" }),
+            listId: useField({ value: syncJob?.trelloList?.id || "" }),
+            fromOrder: useField({ value: syncJob?.trelloOrder?.id }),
         },
         onSubmit,
     });
 
-    const handleBoardChange = useCallback((selection) => {
+    const handleBoardChange = useCallback(({ selection }) => {
         setSelectBoard(selection);
         console.log(selection);
-        // boardID.onChange(selection);
+        boardId.onChange(selection[0].id);
     }, []);
 
     const handleListChange = useCallback((selection) => {
         setSelectList(selection);
         console.log(selection);
-        // boardID.onChange(selection);
+        boardId.onChange(selection[0].id);
     }, []);
 
     const handleOrderChange = useCallback((selection) => {
         setSelectOrder(selection);
         console.log(selection);
-        // boardID.onChange(selection);
+        fromOrder.onChange(selection[0].id);
     }, []);
 
     const toggleResourcePicker = useCallback(
-        ({ type }) => {
+        (resourceType) => {
             setShowResourcePicker(!showResourcePicker);
-            console.log(type);
+            console.log(resourceType);
         },
         [showResourcePicker]
     );
@@ -107,29 +103,71 @@ const SyncForm = ({ syncJob: InitialJob }) => {
                                 <TextField
                                     {...title}
                                     label="Title"
-                                    helpText="Pick a unique title to differentiate from other jobs"
                                     labelHidden
+                                    helpText="Pick a unique title to differentiate from other jobs"
                                 />
                             </Card>
                             <Card
-                                sectioned
                                 title="Board"
                                 actions={[
                                     {
-                                        content: boardID
+                                        content: boardId
                                             ? "Change board"
                                             : "Select board",
-                                        onAction: toggleResourcePicker("board"),
+                                        onAction: () =>
+                                            toggleResourcePicker("board"),
                                     },
                                 ]}
                             >
-                                <Card.Section></Card.Section>
+                                <Card.Section>
+                                    <TextStyle variation="strong">
+                                        {selectBoard}
+                                    </TextStyle>
+                                </Card.Section>
+                            </Card>
+
+                            <Card
+                                title="List"
+                                actions={[
+                                    {
+                                        content: listId
+                                            ? "Change list"
+                                            : "Select list",
+                                        onAction: () =>
+                                            toggleResourcePicker("list"),
+                                    },
+                                ]}
+                            >
+                                <Card.Section>
+                                    <TextStyle variation="strong">
+                                        {selectList}
+                                    </TextStyle>
+                                </Card.Section>
+                            </Card>
+
+                            <Card
+                                title="Order"
+                                actions={[
+                                    {
+                                        content: fromOrder
+                                            ? "Change order"
+                                            : "Select order",
+                                        onAction: () =>
+                                            toggleResourcePicker("order"),
+                                    },
+                                ]}
+                            >
+                                <Card.Section>
+                                    <TextStyle variation="strong">
+                                        {selectOrder}
+                                    </TextStyle>
+                                </Card.Section>
                             </Card>
                         </FormLayout>
                     </Form>
                 </Layout.Section>
                 <Layout.Section secondary>
-                    <Card sectioned title="QR code">
+                    <Card sectioned title="Manual Sync">
                         <Stack vertical>
                             <Button fullWidth primary>
                                 Run Sync
