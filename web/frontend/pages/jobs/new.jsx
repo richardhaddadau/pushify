@@ -1,5 +1,6 @@
 import { Page } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
+import { SyncForm } from "../../components";
 
 const ManageJob = () => {
     const breadcrumbs = [{ content: "Jobs", url: "/" }];
@@ -11,6 +12,7 @@ const ManageJob = () => {
                 breadcrumbs={breadcrumbs}
                 primaryAction={null}
             />
+            <SyncForm />
         </Page>
     );
 };

@@ -1,2 +1,2 @@
-export { ProductsCard } from "./ProductsCard";
+export { SyncForm } from "./SyncForm.jsx";
 export * from "./providers";
