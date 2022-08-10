@@ -3,7 +3,7 @@ import { TitleBar } from "@shopify/app-bridge-react";
 import { SyncForm } from "../../components";
 
 const ManageJob = () => {
-    const breadcrumbs = [{ content: "Jobs", url: "/" }];
+    const breadcrumbs = [{ content: "Sync Jobs", url: "/" }];
 
     return (
         <Page>
